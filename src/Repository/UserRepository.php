@@ -51,6 +51,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return $user;
         }
         $user = (new User())
+            ->setRoles(['ROLE_USER'])
             ->setGithubId($owner->getId())
             ->setEmail($owner->getEmail());
 
