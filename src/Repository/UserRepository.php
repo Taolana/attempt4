@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use League\OAuth2\Client\Provider\GithubResourceOwner;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -36,32 +37,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findOrCreateFromGithubOauth(GithubResourceOwner $owner)
     {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
+        $user = $this->createQueryBuilder('u')
+            ->where('u.githubId = :githubId')
+            ->setParameters([
+               'githubId' => $owner->getId(),
+            ])
             ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+            ->getOneOrNullResult();
 
-    /*
-    public function findOneBySomeField($value): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        if($user){
+            return $user;
+        }
+        $user = (new User())
+            ->setGithubId($owner->getId())
+            ->setEmail($owner->getEmail());
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $user;
     }
-    */
 }

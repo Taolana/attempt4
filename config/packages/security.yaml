@@ -19,8 +19,10 @@ security:
             lazy: true
             provider: app_user_provider
             guard:
+                entry_point: App\Security\AppAuthenticator
                 authenticators:
                     - App\Security\AppAuthenticator
+                    - App\Security\GithubAuthenticator
             logout:
                 path: app_logout
                 # where to redirect after logout
