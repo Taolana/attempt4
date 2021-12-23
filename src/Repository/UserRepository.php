@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use League\OAuth2\Client\Provider\GithubResourceOwner;
 use League\OAuth2\Client\Provider\Google;
 use League\OAuth2\Client\Provider\GoogleUser;
+use Stevenmaguire\OAuth2\Client\Provider\MicrosoftResourceOwner;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -75,11 +76,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         /** @var User $user */
         $user = $this->createQueryBuilder('u')
-            ->where('u.githubId = :githubId')
+            ->where('u.googleId = :googleId')
             ->orWhere('u.email = :email')
             ->setParameters([
                 'email' => $owner->getEmail(),
-                'githubId' => $owner->getId(),
+                'googleId' => $owner->getId(),
             ])
             ->getQuery()
             ->getOneOrNullResult();
@@ -94,6 +95,38 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user = (new User())
             ->setRoles(['ROLE_USER'])
             ->setGoogleId($owner->getId())
+            ->setEmail($owner->getEmail());
+
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        $em->flush();
+
+        return $user;
+    }
+
+    public function findOrCreateFromMicrosoftOauth(MicrosoftResourceOwner $owner)
+    {
+        /** @var User $user */
+        $user = $this->createQueryBuilder('u')
+            ->where('u.microsoftId = :microsoftId')
+            ->orWhere('u.email = :email')
+            ->setParameters([
+                'email' => $owner->getEmail(),
+                'microsoftId' => $owner->getId(),
+            ])
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if($user){
+            if ($user->getMicrosoftId() ===  null){
+                $user->setMicrosoftId($owner->getId());
+                $this->getEntityManager()->flush();
+            }
+            return $user;
+        }
+        $user = (new User())
+            ->setRoles(['ROLE_USER'])
+            ->setMicrosoftId($owner->getId())
             ->setEmail($owner->getEmail());
 
         $em = $this->getEntityManager();

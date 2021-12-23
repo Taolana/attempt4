@@ -64,6 +64,19 @@ class SecurityController extends AbstractController
     }
 
     /**
+     * @Route("/connect/microsoft", name="microsoft_connect")
+     */
+    public function connectMicrosoft(ClientRegistry $clientRegistry){
+        /** @var GoogleClient $client */
+        $client = $clientRegistry->getClient('microsoft');
+        return $client->redirect(
+            [
+                'wl.basic', 'wl.signin', 'wl.emails'
+            ]
+        );
+    }
+
+    /**
      * @Route("/logout", name="app_logout")
      */
     public function logout(): void

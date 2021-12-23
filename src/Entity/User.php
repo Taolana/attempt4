@@ -45,6 +45,11 @@ class User implements UserInterface
      */
     private $googleId;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $microsoftId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -146,6 +151,18 @@ class User implements UserInterface
     public function setGoogleId(?string $googleId): self
     {
         $this->googleId = $googleId;
+
+        return $this;
+    }
+
+    public function getMicrosoftId(): ?string
+    {
+        return $this->microsoftId;
+    }
+
+    public function setMicrosoftId(?string $microsoftId): self
+    {
+        $this->microsoftId = $microsoftId;
 
         return $this;
     }

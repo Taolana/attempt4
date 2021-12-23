@@ -145,6 +145,9 @@
     "ralouphie/getallheaders": {
         "version": "3.0.3"
     },
+    "stevenmaguire/oauth2-microsoft": {
+        "version": "2.2.0"
+    },
     "symfony/cache": {
         "version": "v5.1.11"
     },
