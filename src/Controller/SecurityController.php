@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\Provider\GithubClient;
+use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,6 +47,20 @@ class SecurityController extends AbstractController
         /** @var GithubClient $client */
         $client = $clientRegistry->getClient('github');
         return $client->redirect(['read:user', 'user:email']);
+    }
+
+    /**
+     * @Route("/connect/google", name="google_connect")
+     */
+    public function connectGoogle(ClientRegistry $clientRegistry){
+        /** @var GoogleClient $client */
+        $client = $clientRegistry->getClient('google');
+        return $client->redirect(
+            [
+                'https://www.googleapis.com/auth/userinfo.email',
+                'https://www.googleapis.com/auth/userinfo.profile'
+            ]
+        );
     }
 
     /**
